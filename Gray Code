@@ -1,0 +1,20 @@
+int* grayCode(int n, int* returnSize){
+    int* arr = (int*) malloc(sizeof(int) * 1<<n);
+    *returnSize = (1<<n);
+    // base case
+    if (n == 1) {
+        arr[0] = 0;
+        arr[1] = 1;
+        return arr;
+    }
+    int* recursed = grayCode(n-1, returnSize);
+    *returnSize = (1<<n);
+    memcpy(arr, recursed, sizeof(int) * (1<<(n-1)));
+    free(recursed);
+	recursed = NULL;
+    int j = 1<<(n-1);
+    for (int i = (1<<(n-1))-1; i >= 0; i--, j++) {
+        arr[j] = arr[i] | (1<<(n-1));        
+    }
+    return arr;
+}
