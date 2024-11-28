@@ -1,0 +1,137 @@
+/* Global veriable */
+int **subset_array;
+int *subset_size;
+int subset_cnt;
+
+/* Tool function */
+static int get_subset_max_size(int input_size)
+{
+    int ret = 1;    // 2^0
+    int i;
+    
+    for (i = 0; i < input_size; i++)
+    {
+        ret *= 2;
+    }
+    
+    return ret;
+}
+
+static bool check_subset_duplicate(int *out_buf, int out_cnt)
+{
+    bool ret = false;
+    int i;
+    
+    for (i = 0; i < subset_cnt; i++)
+    {
+        if(out_cnt == subset_size[i])
+        {
+            if(!memcmp(out_buf, subset_array[i], sizeof(int) * out_cnt))
+            {
+                ret = true;
+                goto check_dup_finish;
+            }
+        }
+    }
+
+check_dup_finish:
+    return ret;
+}
+
+static void bubble_sort(int *buf, int size)
+{
+    int i, j, tmp;
+    int buf_tail = size - 1;
+
+    for (i = 0; i < size; i++)
+    {
+        for (j = buf_tail; j > i; j--)
+        {
+            if(buf[j] < buf[j-1])
+            {
+                tmp = buf[j-1];
+                buf[j-1] = buf[j];
+                buf[j] = tmp;
+            }
+        }
+    }
+}
+
+/* Recursive function                                       *
+ * input_ptr[input_remain] devide to two case:              *
+ *     (1) choose input_ptr[0] to out_buf[]                 *
+ *     (2) do not choose input_ptr[0] to out_buf[]          *
+ * Both case use find_subsets() to resolve remaining input  *
+ *                                                          *
+ * If satisfied target size, Record out_buf[] if needed.    *
+ *                                                          */
+static void find_subsets(int *input_ptr, int input_remain, int *out_buf, int out_cnt, int target_size)
+{
+    if (target_size)
+    {
+        // choose input_ptr[0] to out_buf[]
+        out_buf[out_cnt] = input_ptr[0];
+        find_subsets(&input_ptr[1], input_remain - 1, out_buf, out_cnt + 1, target_size - 1);
+        
+        if(input_remain > target_size)
+        {
+            // do not choose input_ptr[0] to out_buf[]
+            find_subsets(&input_ptr[1], input_remain - 1, out_buf, out_cnt, target_size);
+        }
+    }
+    else
+    {
+        // if subset_array[] cannot find subset in out_buf[], record this subset
+        if(check_subset_duplicate(out_buf, out_cnt) == false)
+        {
+            subset_array[subset_cnt] = (int *)malloc(sizeof(int) * out_cnt);
+            memcpy(subset_array[subset_cnt], out_buf, sizeof(int) * out_cnt);
+            subset_size[subset_cnt] = out_cnt;
+            subset_cnt++;
+        }
+    }
+}
+
+/**
+ * Return an array of arrays of size *returnSize.
+ * The sizes of the arrays are returned as *returnColumnSizes array.
+ * Note: Both returned array and *columnSizes array must be malloced, assume caller calls free().
+ */
+int** subsetsWithDup(int* nums, int numsSize, int* returnSize, int** returnColumnSizes){
+    int temp_array[numsSize];
+    int **ret_array;
+    int i;
+    
+    // resort nums[] to ascending power
+    bubble_sort(nums, numsSize);
+    
+    // allocate max size buffer before we find subsets
+    subset_array = (int **)malloc(sizeof(int *) * get_subset_max_size(numsSize));
+    subset_size = (int *)malloc(sizeof(int) * get_subset_max_size(numsSize));
+
+    // record empty set
+    subset_array[0] = NULL;
+    subset_size[0] = 0;
+    subset_cnt = 1;
+
+    // find subsets
+    for (i = 1; i <= numsSize; i++)
+    {
+        memset(temp_array, 0, numsSize);
+        find_subsets(nums, numsSize, temp_array, 0, i);
+    }
+    
+    // replace buffer after we get subset_cnt
+    *returnSize = subset_cnt;
+
+    ret_array = (int **)malloc(sizeof(int *) * subset_cnt);
+    memcpy(ret_array, subset_array, sizeof(int *) * subset_cnt);
+    
+    *returnColumnSizes = (int *)malloc(sizeof(int) * subset_cnt);
+    memcpy(*returnColumnSizes, subset_size, sizeof(int) * subset_cnt);
+    
+    free(subset_array);
+    free(subset_size);
+
+    return ret_array;
+}
