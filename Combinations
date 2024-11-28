@@ -1,0 +1,60 @@
+/**
+ * Return an array of arrays of size *returnSize.
+ * The sizes of the arrays are returned as *returnColumnSizes array.
+ * Note: Both returned array and *columnSizes array must be malloced, assume caller calls free().
+ */
+typedef struct{
+    int num_limit;  // n
+    int cur_num;    // current n
+    int times_limit; // k
+    int cur_times;   // current k
+}param_t;
+
+void find_all_combine(param_t param, int *retSize, int *temp_array, int **ret_array){
+
+    if(param.cur_num > param.num_limit){
+        return ;
+    }
+
+    if(param.cur_times == param.times_limit){
+        temp_array[param.cur_times - 1] = param.cur_num;
+        ret_array[(*retSize)] = (int *)malloc(sizeof(int) * param.times_limit);
+        memcpy(ret_array[(*retSize)++], temp_array, sizeof(int) * param.times_limit);
+        // printf("%d %d\n", temp_array[0], temp_array[1]);
+        return ;
+    }
+
+    temp_array[param.cur_times++ - 1] = param.cur_num;
+    for(int i = param.cur_num + 1; i <= param.num_limit; i++){
+        param.cur_num = i;
+        find_all_combine(param, retSize, temp_array, ret_array);
+    } 
+}
+
+int** combine(int n, int k, int* returnSize, int** returnColumnSizes) {
+    // C n k
+
+    param_t param = {
+        .num_limit = n,
+        .cur_num = 1,
+        .times_limit = k,
+        .cur_times = 1
+    };
+
+    int len = 0;
+    int **ret_arr = (int **)malloc(sizeof(int *) * 200000); // C 20 10
+
+    for(int i = 1 ; i <= n; i++){
+        param.cur_num = i;
+        int temp[k];    
+        find_all_combine(param, &len, temp, ret_arr);
+    }
+
+    *returnColumnSizes = (int *)malloc(sizeof(int) * len);
+    for(int i = 0; i < len; i++){
+        (*returnColumnSizes)[i] = k;
+    }
+    // memset(*returnColumnSizes, k, sizeof(int) * len);
+    *returnSize = len;
+    return ret_arr;
+}
