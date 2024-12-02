@@ -1,0 +1,11 @@
+int numDecodings(char* s) {
+    int i = 1, a = 1, b = 1;
+    if (s[0] != '\0') b = s[0] >= '1';
+    while (s[i++] != '\0') {
+        int c = 0;
+        if (s[i - 1] >= '1') c += b;
+        if ((s[i - 2] == '1') || (s[i - 2] == '2' && s[i - 1] <= '6')) c += a;
+        a = b; b = c;
+    }
+    return b;
+}
