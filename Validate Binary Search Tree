@@ -1,0 +1,16 @@
+bool isValidBST(struct TreeNode *root)
+{
+    if (root == NULL)
+        return true;
+    if (root->left != NULL && (!isValidBST(root->left) || rightmost(root->left) >= root->val))
+        return false;
+    if (root->right != NULL && (!isValidBST(root->right) || leftmost(root->right) <= root->val))
+        return false;
+    return true;
+}
+
+int leftmost(struct TreeNode *node)
+{   return (node->left == NULL) ? node->val : leftmost(node->left); }
+
+int rightmost(struct TreeNode *node)
+{   return (node->right == NULL) ? node->val : rightmost(node->right); }
