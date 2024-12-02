@@ -1,0 +1,43 @@
+struct ListNode* reverseBetween(struct ListNode* head, int left, int right) {
+
+	if (head == NULL) return NULL;
+
+	if (left == right) return head;
+
+	struct ListNode* prev = NULL;
+	struct ListNode* curr = head;
+
+	int index = 1;
+	while (index < left)
+	{
+		prev = curr;
+		curr = curr->next;
+		index++;
+	}
+
+	struct ListNode* leftMinusOneNode = prev;
+
+	struct ListNode* leftNode = curr;
+	struct ListNode* next = NULL;
+
+	while (left <= right)
+	{
+		next = curr->next;
+
+		curr->next = prev;
+
+		prev = curr;
+		curr = next;
+		left++;
+	}
+
+	if (leftMinusOneNode == NULL) // means head changes
+		head = prev;
+	else
+		leftMinusOneNode->next = prev;   // [	1	(2	<-	3	<-	4)	5	]  // when input -> 5 2 4
+										 //	 1 is leftMinusOneNode and 4 is prev
+										 //  so 1's next is 4	
+	leftNode->next = curr;				 //  and 2 is leftNode, so makes 2's next is 5	
+
+	return head;
+}
