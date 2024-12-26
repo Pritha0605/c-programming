@@ -1,0 +1,27 @@
+bool isAnagram(char* s, char* t) {
+    int i,j;
+    int *a = (int *)calloc(26 , sizeof(int));
+    int *b = (int *)calloc(26 , sizeof(int)); 
+    int c,d;
+    int e,f;   
+    int p,q;
+    p = strlen(s);
+    q = strlen(t);
+    if(p != q){
+        return false;
+    }
+    for(i = 0;i < p;i++){
+        e = s[i] - 'a';
+        f = t[i] - 'a';
+        a[e]++; 
+        b[f]++;    
+    }
+    for(j = 0;j <= 25 ;j++){
+        c = a[j];
+        d = b[j];
+        if(c != d){
+            return false;
+        }
+    }
+    return true;        
+}
