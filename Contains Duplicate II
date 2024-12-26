@@ -1,0 +1,55 @@
+bool containsNearbyDuplicate(int* nums, int numsSize, int k)
+{
+    if(k==0)return false;
+    
+    int zeros = -1;
+    int zeroArr[10];
+    typedef struct dups
+    {
+        size_t index;
+        int val;        
+    } dups;
+        
+    dups* p = (dups*)calloc(numsSize+2, sizeof(dups));
+        
+    for (size_t i = 0; i < numsSize; i++)
+    {
+        if(nums[i] == 0)
+        {
+            ++zeros;
+            zeroArr[zeros] = i;
+            
+            if(zeros > 0 && (zeroArr[zeros] - zeroArr[zeros-1]) > 0 && 
+               (zeroArr[zeros] - zeroArr[zeros-1]) <= k)
+            {
+                free(p);
+                return true;
+            }
+            else
+                continue;
+        }
+        size_t x = abs((nums[i])%(numsSize+2));
+        if (p[x].val == 0)
+        {
+            p[x].val = nums[i];
+            p[x].index = i;
+        }
+        else
+        {
+            if( p[x].val == nums[i] &&  abs(i - (p[x].index)) > 0 &&  
+               abs(i - (p[x].index)) <= k)
+            {
+                free(p);
+                return true;
+            }
+            else
+                if(p[x].val == nums[i])
+                {
+                    p[x].index = i;
+                }
+                continue;
+        }
+    }
+    free(p);
+    return false;    
+}
